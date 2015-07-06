@@ -21,6 +21,12 @@ class Notification(Frame):
         f.pack(fill=X)
 
 
+class Notifications(object):
+    notifications = {}
+    def add(self, text, icon, tags):
+    def remove(self, id):
+    def list(self, tags):
+    
 class HTTPRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
