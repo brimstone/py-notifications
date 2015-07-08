@@ -52,10 +52,11 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             if data["tags"]:
                 for t in data["tags"]:
                     for i in reversed(range(0, len(notifications))):
-                        print "I should look for %s in %s" % (t, notifications[i].tags)
-                        if notifications[i].tags.index(t) >= 0:
-                            print "Found one!"
-                            del notifications[i]
+                        try:
+                            if notifications[i].tags.index(t) >= 0:
+                                del notifications[i]
+                        except:
+                            next
             self.send_response(200)
             self.end_headers()
             self.wfile.write("ok")
