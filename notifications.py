@@ -4,27 +4,36 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from SocketServer import ThreadingMixIn
 import threading
 import json
+import webbrowser
 
 
 class Notification(Frame):
 
-    def __init__(self, master, text, icon, tags):
+    def __init__(self, master, text, icon, url, tags):
+        self.url = url
         self.tags = tags
         self.text = StringVar()
         self.f = Frame(master)
+        self.f.bind("<Button-1>", self.click)
         # add a picture
         self.image = PhotoImage(file="icons/%s.png" % icon)
         self.i = Label(self.f, image=self.image)
         self.i.pack(side=LEFT)
+        self.i.bind("<Button-1>", self.click)
         # add some text
         self.text.set(text)
         self.l = Label(self.f, textvar=self.text, justify=LEFT)
         self.l.pack(side=LEFT, fill=X)
+        self.l.bind("<Button-1>", self.click)
         # pack it all in
         self.f.pack(fill=X)
 
     def __del__(self):
         self.f.pack_forget()
+
+    def click(self, event):
+        if self.url:
+            webbrowser.open(self.url)
 
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
@@ -40,7 +49,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             length = int(self.headers.getheader('content-length'))
             data = json.loads(self.rfile.read(length))
             notifications.append(Notification(
-                                 master, text=data["text"], icon=data["icon"], tags=data["tags"]))
+                                 master, text=data["text"], icon=data["icon"], tags=data["tags"], url=data["url"]))
             self.send_response(200)
             self.end_headers()
             self.wfile.write("ok")
